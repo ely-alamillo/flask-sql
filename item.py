@@ -29,6 +29,16 @@ class Item(Resource):
         if row:
             return {"item": {"name": row[0], "price": row[1]}}
 
+    @classmethod
+    def insert(cls, item):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+
+        query = "INSERT INTO items VALUES (?, ?)"
+        cursor.execute(query, (item["name"], item["price"]))
+        connection.commit()
+        connection.close()
+
     def post(self, name):
         if self.find_by_name(name):
             # 400 bad request
@@ -42,15 +52,14 @@ class Item(Resource):
             )
 
         data = Item.parser.parse_args()
-        price = data["price"]
-        item = {"name": name, "price": price}
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+        item = {"name": name, "price": data["price"]}
 
-        query = "INSERT INTO items VALUES (?, ?)"
-        cursor.execute(query, (item["name"], item["price"]))
-        connection.commit()
-        connection.close()
+        try:
+            self.insert(item)
+        except:
+            # 500 internal server error, not your fault ours
+            return {"message": "an error occured inserting the item"}, 500
+
         # 201 is for created
         return item, 201
 

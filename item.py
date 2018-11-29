@@ -55,12 +55,16 @@ class Item(Resource):
         return item, 201
 
     def delete(self, name):
-        # fixes scoping of item from local -> global
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
 
-        # global items
-        # items = list(filter(lambda x: x["name"] != name, items))
-        # return {"message": "item deleted"}, 200
-        pass
+        query = "DELETE FROM items WHERE name=?"
+        cursor.execute(query, (name,))
+
+        connection.commit()
+        connection.close()
+
+        return {"message": "item deleted"}, 200
 
     def put(self, name):
         # data = Item.parser.parse_args()

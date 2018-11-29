@@ -11,6 +11,13 @@ class Item(Resource):
 
     @jwt_required
     def get(self, name):
+        item = self.find_by_name(name)
+        if item:
+            return item
+        return {"message": "item not found"}, 404
+
+    @classmethod
+    def find_by_name(cls, name):
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
 
@@ -22,10 +29,8 @@ class Item(Resource):
         if row:
             return {"item": {"name": row[0], "price": row[1]}}
 
-        return {"message": "item not found"}, 404
-
     def post(self, name):
-        if next(filter(lambda x: x["name"] == name, items), None):
+        if self.find_by_name(name):
             # 400 bad request
             return (
                 {
@@ -39,28 +44,37 @@ class Item(Resource):
         data = Item.parser.parse_args()
         price = data["price"]
         item = {"name": name, "price": price}
-        items.append(item)
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+
+        query = "INSERT INTO items VALUES (?, ?)"
+        cursor.execute(query, (item["name"], item["price"]))
+        connection.commit()
+        connection.close()
         # 201 is for created
         return item, 201
 
     def delete(self, name):
         # fixes scoping of item from local -> global
 
-        global items
-        items = list(filter(lambda x: x["name"] != name, items))
-        return {"message": "item deleted"}, 200
+        # global items
+        # items = list(filter(lambda x: x["name"] != name, items))
+        # return {"message": "item deleted"}, 200
+        pass
 
     def put(self, name):
-        data = Item.parser.parse_args()
-        item = next(filter(lambda x: x["name"] == name, items), None)
-        if item is None:
-            item = {"name": name, "price": data["price"]}
-            items.append(item)
-        else:
-            item.update(data)
-        return item
+        # data = Item.parser.parse_args()
+        # item = next(filter(lambda x: x["name"] == name, items), None)
+        # if item is None:
+        #     item = {"name": name, "price": data["price"]}
+        #     items.append(item)
+        # else:
+        #     item.update(data)
+        # return item
+        pass
 
 
 class ItemList(Resource):
     def get(self):
-        return {"items": items}
+        # return {"items": items}
+        pass

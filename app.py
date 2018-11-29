@@ -50,4 +50,5 @@ api.add_resource(ItemList, "/items")
 api.add_resource(UserRegister, "/register")
 api.add_resource(Auth, "/auth")
 
-app.run(port=5000, debug=True)
+if __name__ == "__main__":
+    app.run(port=5000, debug=True)

@@ -11,7 +11,6 @@ create_items_table = "CREATE TABLE IF NOT EXISTS items\
 
 cursor.execute(create_users_table)
 cursor.execute(create_items_table)
-cursor.execute('INSERT INTO items VALUES ("test", 11.99)')
 
 connection.commit()
 connection.close()

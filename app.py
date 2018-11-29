@@ -10,6 +10,8 @@ from flask_jwt_extended import (
     get_jwt_identity,
 )
 
+from user import UserRegister
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -100,6 +102,7 @@ class Auth(Resource):
 
 api.add_resource(Item, "/item/<string:name>")
 api.add_resource(ItemList, "/items")
+api.add_resource(UserRegister, "/register")
 api.add_resource(Auth, "/auth")
 
 app.run(port=5000, debug=True)
